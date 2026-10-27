@@ -1,0 +1,782 @@
+/* ==========================================================================
+   Tiny Casablanca — Pixel Art Map Stylesheet
+   Modern Cyber-Retro Moroccan Glassmorphism Design System
+   ========================================================================== */
+
+:root {
+  --bg-dark: #0b0f19;
+  --bg-card: rgba(15, 23, 42, 0.85);
+  --bg-card-hover: rgba(30, 41, 59, 0.92);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(229, 169, 60, 0.4);
+  
+  --morocco-red: #C1272D;
+  --morocco-green: #006233;
+  --gold-accent: #E5A93C;
+  --terracotta: #D96B43;
+  --casablanca-blue: #0047AB;
+  
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-accent: #FDE047;
+
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --shadow-lg: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border-glass);
+  --shadow-glow: 0 0 20px rgba(229, 169, 60, 0.25);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+/* Day Mode (Default) */
+body.theme-day {
+  --filter-tone: none;
+}
+
+/* Sunset Mode */
+body.theme-sunset {
+  --filter-tone: sepia(0.3) saturate(1.4) hue-rotate(-15deg) contrast(1.05);
+}
+
+/* Night Cyber Mode */
+body.theme-night {
+  --filter-tone: invert(0.05) hue-rotate(185deg) saturate(1.3) contrast(1.15) brightness(0.85);
+}
+
+/* ==========================================================================
+   Base & Resets
+   ========================================================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: var(--font-main);
+  color: var(--text-main);
+  user-select: none;
+}
+
+/* ==========================================================================
+   Map Viewport & Canvas
+   ========================================================================== */
+.map-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: #ded7c9;
+  filter: var(--filter-tone);
+  transition: filter 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Force Crisp Pixel Art Rendering in Canvas */
+.map-viewport canvas {
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+}
+
+/* Retro Pixel Grid Overlay */
+.grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  opacity: 0.75;
+}
+.grid-overlay.hidden {
+  display: none;
+}
+
+/* ==========================================================================
+   Top Header HUD
+   ========================================================================== */
+.hud-header {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  height: 64px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flag-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 8px rgba(193, 39, 45, 0.5));
+  animation: flag-pulse 3s infinite ease-in-out;
+}
+
+@keyframes flag-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(229, 169, 60, 0.5);
+}
+
+.logo-subtitle {
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  color: var(--gold-accent);
+}
+
+/* Telemetry Bar */
+.telemetry-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 16px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.telemetry-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.telem-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.telem-val {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.telemetry-divider {
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-btn:hover {
+  background: rgba(229, 169, 60, 0.2);
+  border-color: var(--gold-accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(229, 169, 60, 0.2);
+}
+
+/* ==========================================================================
+   Floating Map Controls
+   ========================================================================== */
+.floating-controls {
+  position: absolute;
+  right: 20px;
+  top: 96px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.control-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--gold-accent);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-glow);
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================================
+   Landmark Quick-Navigator Drawer
+   ========================================================================== */
+.landmark-drawer {
+  position: absolute;
+  left: 20px;
+  top: 96px;
+  bottom: 20px;
+  width: 320px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s ease;
+  overflow: hidden;
+}
+
+.landmark-drawer.collapsed {
+  transform: translateX(calc(-100% + 56px));
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.drawer-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-icon {
+  font-size: 18px;
+}
+
+.drawer-title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--gold-accent);
+}
+
+.landmark-counter {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(229, 169, 60, 0.25);
+  border-radius: 10px;
+  color: var(--text-accent);
+}
+
+.drawer-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.drawer-toggle-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.search-wrap {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.search-wrap input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-wrap input:focus {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 10px rgba(229, 169, 60, 0.2);
+}
+
+.landmark-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landmark-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.landmark-item:hover {
+  background: rgba(229, 169, 60, 0.12);
+  border-color: var(--border-accent);
+  transform: translateX(4px);
+}
+
+.landmark-item-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.landmark-item-info {
+  flex: 1;
+}
+
+.landmark-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.landmark-item-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Minimap / Radar HUD
+   ========================================================================== */
+.minimap-container {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 220px;
+  height: 170px;
+  z-index: 10;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.minimap-header {
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-accent);
+  letter-spacing: 1px;
+}
+
+.minimap-body {
+  position: relative;
+  flex: 1;
+  background: #000;
+  overflow: hidden;
+}
+
+.minimap-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.minimap-viewport {
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+  border: 2px solid var(--morocco-red);
+  box-shadow: 0 0 10px rgba(193, 39, 45, 0.8), inset 0 0 10px rgba(193, 39, 45, 0.4);
+  pointer-events: none;
+  transition: all 0.1s linear;
+}
+
+/* ==========================================================================
+   Interactive Landmark Pins on Canvas
+   ========================================================================== */
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-pin:hover {
+  transform: translate(-50%, -115%) scale(1.15);
+  z-index: 20;
+}
+
+.pin-bubble {
+  padding: 4px 10px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--gold-accent);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(229, 169, 60, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pin-marker {
+  width: 14px;
+  height: 14px;
+  background: var(--morocco-red);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(193, 39, 45, 0.9);
+  margin-top: 2px;
+  animation: marker-pulse 2s infinite ease-out;
+}
+
+@keyframes marker-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(193, 39, 45, 0.7); }
+  70% { box-shadow: 0 0 0 12px rgba(193, 39, 45, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(193, 39, 45, 0); }
+}
+
+/* ==========================================================================
+   Modals
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-card {
+  position: relative;
+  width: 90%;
+  max-width: 480px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  animation: modal-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+  from { transform: scale(0.92) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--morocco-red);
+  transform: rotate(90deg);
+}
+
+.modal-banner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background: #000;
+  overflow: hidden;
+}
+
+.modal-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.modal-badge-row {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.modal-tag {
+  padding: 4px 10px;
+  background: rgba(0, 71, 171, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.modal-tag.secondary {
+  background: rgba(229, 169, 60, 0.85);
+  color: #000;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.modal-title-ar {
+  font-size: 15px;
+  color: var(--gold-accent);
+  margin-top: 2px;
+  margin-bottom: 14px;
+}
+
+.modal-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.modal-features h5 {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.modal-features ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-features li {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-features li::before {
+  content: "✦";
+  color: var(--gold-accent);
+}
+
+.modal-footer {
+  margin-top: 20px;
+}
+
+.fly-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--morocco-red), var(--terracotta));
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(193, 39, 45, 0.4);
+  transition: all 0.2s;
+}
+
+.fly-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(193, 39, 45, 0.6);
+}
+
+/* Info Modal Content */
+.info-card {
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.info-content {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.info-content p {
+  margin-bottom: 14px;
+}
+
+.info-content h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin: 18px 0 8px 0;
+}
+
+.info-content ul {
+  padding-left: 18px;
+  margin-bottom: 14px;
+}
+
+.info-content li {
+  margin-bottom: 6px;
+}
+
+.info-content a {
+  color: var(--gold-accent);
+  text-decoration: none;
+}
+
+.info-content a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 768px) {
+  .hud-header {
+    height: auto;
+    padding: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .telemetry-bar {
+    display: none;
+  }
+  .landmark-drawer {
+    width: 280px;
+    top: auto;
+    bottom: 16px;
+    height: 380px;
+  }
+  .minimap-container {
+    width: 150px;
+    height: 120px;
+  }
+}

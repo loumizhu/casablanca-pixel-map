@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tiny Casablanca — Isometric Pixel Art City Map</title>
+  <meta name="description" content="An interactive, seamless, isometric pixel-art map of Downtown Casablanca (Centre-Ville), Morocco. Explore Place des Nations Unies, Wilaya, Tour de l'Horloge, Grand Théâtre, and the Ancienne Médina.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇲🇦</text></svg>">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Press+Start+2P&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- OpenSeadragon Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.1/openseadragon.min.js"></script>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Main Map Viewer Container -->
+  <div id="openseadragon-viewer" class="map-viewport"></div>
+
+  <!-- Retro Canvas Grid Overlay (Toggleable) -->
+  <div id="pixel-grid-overlay" class="grid-overlay hidden"></div>
+
+  <!-- Top Cyber-Retro Header HUD -->
+  <header class="hud-header">
+    <div class="brand-badge">
+      <span class="flag-icon">🇲🇦</span>
+      <div class="brand-text">
+        <h1 class="logo-title">TINY CASABLANCA</h1>
+        <span class="logo-subtitle">الدار البيضاء • 16-BIT ISOMETRIC DOWNTOWN MAP</span>
+      </div>
+    </div>
+
+    <!-- Live Telemetry / Coordinates HUD -->
+    <div class="telemetry-bar">
+      <div class="telemetry-item" title="Current WGS84 Coordinates">
+        <span class="telem-label">COORDS:</span>
+        <span id="coord-display" class="telem-val">33.5938° N, 7.6158° W</span>
+      </div>
+      <div class="telemetry-divider"></div>
+      <div class="telemetry-item" title="Current Zoom Multiplier">
+        <span class="telem-label">ZOOM:</span>
+        <span id="zoom-display" class="telem-val">1.00x</span>
+      </div>
+      <div class="telemetry-divider"></div>
+      <div class="telemetry-item" title="Scale per pixel">
+        <span class="telem-label">SCALE:</span>
+        <span class="telem-val">0.35m / px</span>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button id="btn-theme-toggle" class="hud-btn" title="Toggle Day / Sunset / Night Theme">
+        <span class="btn-icon">☀️</span>
+        <span class="btn-text">Day</span>
+      </button>
+      <button id="btn-audio" class="hud-btn" title="Toggle Casablanca Ambient Soundscape">
+        <span class="btn-icon">🔊</span>
+        <span class="btn-text">Audio</span>
+      </button>
+      <button id="btn-info" class="hud-btn" title="Project Info & Credits">
+        <span class="btn-icon">ℹ️</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Floating Navigation Controls -->
+  <nav class="floating-controls">
+    <button id="btn-zoom-in" class="control-btn" title="Zoom In (+)">➕</button>
+    <button id="btn-zoom-out" class="control-btn" title="Zoom Out (-)">➖</button>
+    <button id="btn-home" class="control-btn" title="Reset View (H)">🏠</button>
+    <button id="btn-grid" class="control-btn" title="Toggle Pixel Grid (G)">📐</button>
+    <button id="btn-fullscreen" class="control-btn" title="Toggle Fullscreen (F)">⛶</button>
+  </nav>
+
+  <!-- Landmark Quick-Navigator Drawer (Collapsible) -->
+  <aside id="landmark-drawer" class="landmark-drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <span class="drawer-icon">📍</span>
+        <h2 class="drawer-title">LANDMARKS</h2>
+        <span class="landmark-counter">8</span>
+      </div>
+      <button id="btn-toggle-drawer" class="drawer-toggle-btn" title="Collapse / Expand">◀</button>
+    </div>
+    
+    <div class="search-wrap">
+      <input type="text" id="landmark-search" placeholder="Search landmarks, souks, tram..." autocomplete="off">
+    </div>
+
+    <div id="landmark-list" class="landmark-list">
+      <!-- Landmark items injected by app.js -->
+    </div>
+  </aside>
+
+  <!-- Minimap / Radar Overview -->
+  <div class="minimap-container">
+    <div class="minimap-header">RADAR OVERVIEW</div>
+    <div class="minimap-body">
+      <img src="assets/composite/casablanca_downtown_master.png" alt="Minimap Overview" class="minimap-img">
+      <div id="minimap-viewport" class="minimap-viewport"></div>
+    </div>
+  </div>
+
+  <!-- Landmark Details Modal -->
+  <div id="landmark-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button id="btn-close-modal" class="modal-close">&times;</button>
+      <div class="modal-banner">
+        <img id="modal-img" src="" alt="Landmark Preview">
+        <div class="modal-badge-row">
+          <span id="modal-type" class="modal-tag">Plaza</span>
+          <span id="modal-year" class="modal-tag secondary">1915</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <h3 id="modal-title" class="modal-title">Place des Nations Unies</h3>
+        <h4 id="modal-title-ar" class="modal-title-ar">ساحة الأمم المتحدة</h4>
+        <p id="modal-desc" class="modal-desc">Description goes here.</p>
+        
+        <div class="modal-features">
+          <h5>Architectural Highlights:</h5>
+          <ul id="modal-features-list"></ul>
+        </div>
+        
+        <div class="modal-footer">
+          <button id="modal-fly-btn" class="fly-btn">🎯 Center in View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Information & Methodology Modal -->
+  <div id="info-modal" class="modal-overlay hidden">
+    <div class="modal-card info-card">
+      <button id="btn-close-info" class="modal-close">&times;</button>
+      <div class="modal-body">
+        <h3 class="modal-title">About Tiny Casablanca</h3>
+        <h4 class="modal-title-ar">حول مشروع الدار البيضاء بكسل</h4>
+        <div class="info-content">
+          <p>
+            <strong>Tiny Casablanca</strong> is an interactive, seamless isometric pixel-art map of downtown Casablanca (Centre-Ville), Morocco. Inspired by Boris Starkov's <em>tiny.london</em> and Andy Coenen's <em>isometric.nyc</em>, it transforms architectural geometry into a living 16-bit retro universe.
+          </p>
+          
+          <h4>Technical Architecture</h4>
+          <ul>
+            <li><strong>Isometric Camera:</strong> Single orthographic frustum tilted 45° and rotated 15° (Screen-up is N15°E).</li>
+            <li><strong>Resolution:</strong> 0.35 meters per pixel covering a 2.0 km² historic downtown core ($5,632 \times 4,096$ native canvas).</li>
+            <li><strong>Stylization:</strong> Gemini / Nano Banana AI engine conditioned with structural fidelity constraints and authentic Mediterranean limestone palettes.</li>
+            <li><strong>Seam-Free Blending:</strong> Multi-window tent weighting and street-aligned composite stitching.</li>
+            <li><strong>Tile Pyramid:</strong> Deep Zoom Image (DZI) multi-resolution lossless WebP tiles with OpenSeadragon.</li>
+          </ul>
+
+          <h4>Credits & Licensing</h4>
+          <ul>
+            <li>Map imagery & styling © 2026 Tiny Casablanca Project.</li>
+            <li>Geographical data & boundary coordinates © OpenStreetMap contributors (ODbL).</li>
+            <li>Viewer powered by OpenSeadragon (BSD-3-Clause).</li>
+            <li>Inspired by <a href="https://tiny.london/" target="_blank" rel="noopener">tiny.london</a> by Boris Starkov and <a href="https://isometric.nyc/" target="_blank" rel="noopener">isometric.nyc</a> by Andy Coenen.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Script -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

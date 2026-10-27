@@ -1,0 +1,34 @@
+# Environment & Secrets
+.env
+*.env
+*.ini
+*.key
+ApiKeys*
+secrets/
+
+# Python & Dependencies
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+build/
+dist/
+
+# Node / Web
+node_modules/
+.npm/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.log
+.vscode/
+.idea/
+
+# Large temporary scratch / working files
+assets/raw_temp/
+_temp/
